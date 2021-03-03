@@ -1,5 +1,3 @@
-#___import______________________________________________________________________________________
-
 from tkinter import *
 import random
 
@@ -77,7 +75,7 @@ def createMonster():
 
 def moveMonster():
     for monster in range(len(monsterList)):
-        axeY = playground.coords(monsterList[monster])[1]
+        playground.coords(monsterList[monster])[1]
         monsters = monsterList[monster]
         playground.move(monsters, 0, 50)
         if playground.coords(monsters)[1] + 40 == playground.coords(myShip)[1] - 75:
@@ -102,55 +100,51 @@ bulletList = []
 
 def shootMonster():
     global bulletList
-    myLeftBullet = playground.move(leftBullet, 0, -20)
-    myMidBullet = playground.move(midBullet, 0, -20)
-    myRightBullet = playground.move(rightBullet, 0, -20)
+    playground.move(midBullet, 0, -20)
 
-    myY = playground.coords(leftBullet)[1]
+    myY = playground.coords(midBullet)[1]
     beyondShooting = myY <= 0
+
     monsterBulletToDelete = monsterBullet()
     if len(monsterBulletToDelete) == 0:    
         if not beyondShooting:
             playground.after(10, lambda:shootMonster())
         else:
-            playground.delete(leftBullet)
             playground.delete(midBullet)
-            playground.delete(rightBullet)
             toShoot()
 
 
- 
-
 def toShoot():
-    global myShip, leftBullet, rightBullet, midBullet, bulletList
+    global myShip, midBullet 
     X1 = playground.coords(myShip)[0]
     Y1 = playground.coords(myShip)[1]
-    leftBullet = playground.create_image(X1 - 40, Y1 + 35, image = bulletImage)
     midBullet = playground.create_image(X1, Y1 - 20, image = bulletImage)
-    rightBullet = playground.create_image(X1 + 40, Y1 + 35, image = bulletImage)
-    bulletList = [leftBullet, midBullet, rightBullet]
+
     shootMonster()
 
 
 #___ImpactMonsterBullet____________________________________________________________________________
 
+deleteMonsterBullet = []
+
 def monsterBullet():           # Function use to check the collision of bullet and the monster
-    deleteMonsterBullet = []
-    for bullet in bulletList:
-        bulletPosition = playground.coords(bullet)
-        for theMonster in monsterList:
-            monsterPosition = playground.coords(theMonster)
-            if (bulletPosition[1] <= monsterPosition[1] + 80) and (((bulletPosition[0] >= monsterPosition[0]) and (bulletPosition[0] <= monsterPosition[0] + 80)) or ((bulletPosition[0] + 50 >= monsterPosition[0]) and (bulletPosition[0]+50 <= monsterPosition[0] + 80))):
-                deleteMonsterBullet.append(bullet) 
-                deleteMonsterBullet.append(theMonster)
+    global deleteMonsterBullet 
+
+    bulletPosition = playground.coords(midBullet)
+    for monster in range (len(monsterList)):
+        theMonster = monsterList[monster]
+        monsterPosition = playground.coords(theMonster)
+        if (bulletPosition[1] <= monsterPosition[1] + 60) and (((bulletPosition[0] >= monsterPosition[0]) and (bulletPosition[0] <= monsterPosition[0] + 80)) or ((bulletPosition[0] + 50 >= monsterPosition[0]) and (bulletPosition[0]+50 <= monsterPosition[0] + 60))):
+            deleteMonsterBullet.append(midBullet) 
+            deleteMonsterBullet.append(monster)
     return deleteMonsterBullet
 
 
 def eraseBulletMonster():      # Function to remove bullet and the monster from the list
+    global deleteMonsterBullet  
     monsterBulletToDelete = monsterBullet()
     if len(monsterBulletToDelete) > 0:
-        bulletList.remove(monsterBulletToDelete[0])
-        monsterList.remove(monsterBulletToDelete[1])
+        monsterList.pop(monsterBulletToDelete[1])
         playground.delete(monsterBulletToDelete[0])
         playground.delete(monsterBulletToDelete[1])
         
@@ -166,7 +160,7 @@ def shipMove(event):
         playground.move(myShip, -30, 0)
     elif playground.coords(myShip)[1] > 100 and event.char == "w":
         playground.move(myShip, 0, -30)
-    elif playground.coords(myShip)[1] < 830 and event.char == "s":
+    elif playground.coords(myShip)[1] < 870 and event.char == "s":
         playground.move(myShip, 0, 30)
     
 
