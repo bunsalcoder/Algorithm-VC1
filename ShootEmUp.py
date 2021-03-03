@@ -25,7 +25,7 @@ playground.grid(column = 0, row = 1)
 # Score!!
 
 score = 0
-scoreLabel = Label(top, text = "Score: " + str(score), bg = "black", fg = "blue", font = ("Sans",  25))
+scoreLabel = Label(top, text = "Score: " + str(score), bg = "black", fg = "blue", font = ("Sans",  20))
 scoreLabel.place(x = 50, y = 5)
 
 
@@ -64,7 +64,6 @@ bulletImage = PhotoImage(file = "bullet.png")
 #___Monster Movement_____________________________________________________________________________
 
 monsterList = []
-numberOfLife = 0
 
 def createMonster():
     X = random.randrange(80, 1120)
@@ -78,20 +77,7 @@ def moveMonster():
         playground.coords(monsterList[monster])[1]
         monsters = monsterList[monster]
         playground.move(monsters, 0, 50)
-        if playground.coords(monsters)[1] + 40 == playground.coords(myShip)[1] - 75:
-            numberOfLife += 1
-            lifeLess()
-            
     playground.after(320, lambda: moveMonster())
-
-
-def lifeLess():
-    if numberOfLife == 1:
-        playground.delete(myLives1)
-    elif numberOfLife == 2:
-        playground.delete(myLives2)
-    elif numberOfLife == 3:
-        playground.delete(myLives3)
 
 
 #___Bullet Movement_______________________________________________________________________________
@@ -105,13 +91,11 @@ def shootMonster():
     myY = playground.coords(midBullet)[1]
     beyondShooting = myY <= 0
 
-    monsterBulletToDelete = monsterBullet()
-    if len(monsterBulletToDelete) == 0:    
-        if not beyondShooting:
-            playground.after(10, lambda:shootMonster())
-        else:
-            playground.delete(midBullet)
-            toShoot()
+    if not beyondShooting:
+        playground.after(10, lambda:shootMonster())
+    else:
+        playground.delete(midBullet)
+        toShoot()
 
 
 def toShoot():
@@ -134,9 +118,9 @@ def monsterBullet():           # Function use to check the collision of bullet a
     for monster in range (len(monsterList)):
         theMonster = monsterList[monster]
         monsterPosition = playground.coords(theMonster)
-        if (bulletPosition[1] <= monsterPosition[1] + 60) and (((bulletPosition[0] >= monsterPosition[0]) and (bulletPosition[0] <= monsterPosition[0] + 80)) or ((bulletPosition[0] + 50 >= monsterPosition[0]) and (bulletPosition[0]+50 <= monsterPosition[0] + 60))):
+        if (bulletPosition[1] <= monsterPosition[1] + 60) and (((bulletPosition[0] >= monsterPosition[0]) and (bulletPosition[0] <= monsterPosition[0] + 60)) or ((bulletPosition[0] + 50 >= monsterPosition[0]) and (bulletPosition[0]+50 <= monsterPosition[0] + 60))):
             deleteMonsterBullet.append(midBullet) 
-            deleteMonsterBullet.append(monster)
+            deleteMonsterBullet.append(monsterList[monster])
     return deleteMonsterBullet
 
 
@@ -144,14 +128,14 @@ def eraseBulletMonster():      # Function to remove bullet and the monster from 
     global deleteMonsterBullet  
     monsterBulletToDelete = monsterBullet()
     if len(monsterBulletToDelete) > 0:
-        monsterList.pop(monsterBulletToDelete[1])
+        deleteMonsterBullet.remove(monsterBulletToDelete[1])
         playground.delete(monsterBulletToDelete[0])
         playground.delete(monsterBulletToDelete[1])
         
     playground.after(10, eraseBulletMonster)
 
 
-#___Ship Movement_________________________________________________________________________________
+#___Ship Movement________________________________________________________________________________
 
 def shipMove(event):
     if  playground.coords(myShip)[0] <= 1125 and event.char == "d":
@@ -170,7 +154,6 @@ createMonster()         # This is to create monster
 moveMonster()           # This is to move the monster
 toShoot()               # This is to shoot the monster
 eraseBulletMonster()    # This is to delete bullet and monster from the list
-lifeLess()              # This is to decrease the life
 
 
 #___Key event___________________________________________________________________________________
